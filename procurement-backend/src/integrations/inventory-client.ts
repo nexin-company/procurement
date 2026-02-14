@@ -1,11 +1,11 @@
 /**
- * Integración best-effort con Inventory para registrar entradas a stock.
+ * Integración best-effort con Logistics para registrar entradas a stock.
  */
 
 import { emitPermitAuditLog } from '../audit/permit-client.js'
 
-const INVENTORY_API_URL = process.env.INVENTORY_API_URL || 'http://localhost:8000'
-const INVENTORY_API_KEY = process.env.INVENTORY_API_KEY || ''
+const LOGISTIC_API_URL = process.env.LOGISTIC_API_URL || 'http://localhost:8004'
+const LOGISTIC_API_KEY = process.env.LOGISTIC_API_KEY || ''
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -19,7 +19,7 @@ async function postJsonWithTimeout(url: string, body: any, timeoutMs: number) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-API-Key': INVENTORY_API_KEY,
+        'X-API-Key': LOGISTIC_API_KEY,
       },
       body: JSON.stringify(body),
       signal: controller.signal,
@@ -37,12 +37,12 @@ export async function inventoryAdjustStock(input: {
   reason?: string
 }): Promise<void> {
   try {
-    if (!INVENTORY_API_KEY) {
-      console.warn('⚠️ INVENTORY_API_KEY no configurada: saltando ajuste de stock')
+    if (!LOGISTIC_API_KEY) {
+      console.warn('⚠️ LOGISTIC_API_KEY no configurada: saltando ajuste de stock')
       return
     }
 
-    const url = `${INVENTORY_API_URL}/v1/stock-levels/adjust`
+    const url = `${LOGISTIC_API_URL}/v1/stock/adjust`
     let lastErr: any = null
 
     for (let attempt = 1; attempt <= 2; attempt++) {
@@ -52,10 +52,10 @@ export async function inventoryAdjustStock(input: {
 
         const data = await res.json().catch(() => ({}))
         lastErr = { status: res.status, data }
-        console.warn('⚠️ Falló ajuste de stock en Inventory:', res.status, data?.message || data)
+        console.warn('⚠️ Falló ajuste de stock en Logistics:', res.status, data?.message || data)
       } catch (err) {
         lastErr = err
-        console.warn(`⚠️ Error llamando Inventory attempt ${attempt}:`, err)
+        console.warn(`⚠️ Error llamando Logistics attempt ${attempt}:`, err)
       }
 
       if (attempt < 2) {
@@ -71,8 +71,8 @@ export async function inventoryAdjustStock(input: {
       changes: {
         after: {
           source: 'procurement-backend',
-          target: 'inventory-backend',
-          endpoint: '/v1/stock-levels/adjust',
+          target: 'logistic-backend',
+          endpoint: '/v1/stock/adjust',
           method: 'POST',
           reason: input.reason,
           warehouseId: input.warehouseId,
@@ -82,7 +82,7 @@ export async function inventoryAdjustStock(input: {
       metadata: { error: lastErr },
     })
   } catch (err) {
-    console.warn('⚠️ Error llamando Inventory:', err)
+    console.warn('⚠️ Error llamando Logistics:', err)
   }
 }
 

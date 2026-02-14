@@ -29,9 +29,9 @@ const PERMIT_API_KEY = process.env.PERMIT_API_KEY || '';
 const PROCUREMENT_API_URL = process.env.PROCUREMENT_API_URL || 'http://localhost:8000';
 const PROCUREMENT_API_KEY = process.env.PROCUREMENT_API_KEY || '';
 
-// Para inventory, usar el backend de Inventory
-const INVENTORY_API_URL = process.env.INVENTORY_API_URL || 'http://localhost:8000';
-const INVENTORY_API_KEY = process.env.INVENTORY_API_KEY || '';
+// Para logistics (catálogo, stock, warehouses, mappings, shipments)
+const LOGISTIC_API_URL = process.env.LOGISTIC_API_URL || 'http://localhost:8004';
+const LOGISTIC_API_KEY = process.env.LOGISTIC_API_KEY || '';
 
 // Para finance, usar el backend de Finance
 const FINANCE_API_URL = process.env.FINANCE_API_URL || 'http://localhost:8000';
@@ -62,7 +62,7 @@ class ApiError extends Error {
 async function fetchApi<T>(
   endpoint: string,
   options?: RequestInit,
-  backend: 'permit' | 'procurement' | 'inventory' | 'finance' = 'procurement'
+  backend: 'permit' | 'procurement' | 'logistic' | 'finance' = 'procurement'
 ): Promise<T> {
   // Verificar que el usuario esté autenticado
   const session = await auth();
@@ -71,11 +71,11 @@ async function fetchApi<T>(
   }
 
   const baseUrl = backend === 'permit' ? PERMIT_API_URL 
-    : backend === 'inventory' ? INVENTORY_API_URL 
+    : backend === 'logistic' ? LOGISTIC_API_URL 
     : backend === 'finance' ? FINANCE_API_URL
     : PROCUREMENT_API_URL;
   const apiKey = backend === 'permit' ? PERMIT_API_KEY 
-    : backend === 'inventory' ? INVENTORY_API_KEY 
+    : backend === 'logistic' ? LOGISTIC_API_KEY 
     : backend === 'finance' ? FINANCE_API_KEY
     : PROCUREMENT_API_KEY;
   const url = `${baseUrl}${endpoint}`;
@@ -263,7 +263,7 @@ export const receiptsApi = {
   },
 };
 
-// ==================== INVENTORY (para consultas) ====================
+// ==================== LOGISTICS (para consultas de catálogo y warehouses) ====================
 export interface ExternalProduct {
   id: number;
   externalSkuId: string;
@@ -286,12 +286,12 @@ export interface Warehouse {
 
 export const inventoryApi = {
   getExternalProducts: async (): Promise<ExternalProduct[]> => {
-    const res = await fetchApi<{ data: ExternalProduct[] }>('/v1/external-products', undefined, 'inventory');
+    const res = await fetchApi<{ data: ExternalProduct[] }>('/v1/catalog', undefined, 'logistic');
     return res.data;
   },
 
   getWarehouses: async (): Promise<Warehouse[]> => {
-    const res = await fetchApi<{ data: Warehouse[] }>('/v1/warehouses', undefined, 'inventory');
+    const res = await fetchApi<{ data: Warehouse[] }>('/v1/warehouses', undefined, 'logistic');
     return res.data;
   },
 };

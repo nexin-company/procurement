@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { applyRateLimit, addRateLimitHeaders } from '@/lib/rate-limit-helper';
 
-const INVENTORY_API_URL = process.env.INVENTORY_API_URL || 'http://localhost:8000';
-const INVENTORY_API_KEY = process.env.INVENTORY_API_KEY || '';
+const LOGISTIC_API_URL = process.env.LOGISTIC_API_URL || 'http://localhost:8004';
+const LOGISTIC_API_KEY = process.env.LOGISTIC_API_KEY || '';
 
 export const revalidate = 60;
 
@@ -19,10 +19,10 @@ export async function GET(request: NextRequest) {
       return rateLimitResponse;
     }
 
-    const response = await fetch(`${INVENTORY_API_URL}/v1/warehouses`, {
+    const response = await fetch(`${LOGISTIC_API_URL}/v1/warehouses`, {
       headers: {
         'Content-Type': 'application/json',
-        'X-API-Key': INVENTORY_API_KEY,
+        'X-API-Key': LOGISTIC_API_KEY,
       },
     });
 
@@ -40,11 +40,10 @@ export async function GET(request: NextRequest) {
     
     return addRateLimitHeaders(nextResponse, rateLimitResult);
   } catch (error: any) {
-    console.error('Error en GET /api/inventory/v1/warehouses:', error);
+    console.error('Error en GET /api/logistic/v1/warehouses:', error);
     return NextResponse.json(
       { error: error.message || 'Error al obtener warehouses' },
       { status: 500 }
     );
   }
 }
-

@@ -14,8 +14,8 @@ Al crear un receipt (`POST /v1/receipts`), el backend hace un **ajuste best-effo
 - `POST /v1/stock-levels/adjust` (Inventory)
 
 Requiere:
-- `INVENTORY_API_URL`
-- `INVENTORY_API_KEY`
+- `LOGISTIC_API_URL`
+- `LOGISTIC_API_KEY`
 
 # Procurement Backend
 

@@ -4,7 +4,7 @@
  */
 
 const PROCUREMENT_API_BASE_URL = '/api/procurement/v1';
-const INVENTORY_API_BASE_URL = '/api/inventory/v1';
+const LOGISTIC_API_BASE_URL = '/api/logistic/v1';
 const PERMIT_API_BASE_URL = '/api/permit/v1';
 const FINANCE_API_BASE_URL = '/api/finance/v1';
 
@@ -337,12 +337,12 @@ export interface Warehouse {
 
 export const inventoryApi = {
   getExternalProducts: async (): Promise<ExternalProduct[]> => {
-    const res = await fetchApi<{ data: ExternalProduct[] }>(INVENTORY_API_BASE_URL, '/external-products');
+    const res = await fetchApi<{ data: ExternalProduct[] }>(LOGISTIC_API_BASE_URL, '/catalog');
     return res.data;
   },
 
   getWarehouses: async (): Promise<Warehouse[]> => {
-    const res = await fetchApi<{ data: Warehouse[] }>(INVENTORY_API_BASE_URL, '/warehouses');
+    const res = await fetchApi<{ data: Warehouse[] }>(LOGISTIC_API_BASE_URL, '/warehouses');
     return res.data;
   },
 };
